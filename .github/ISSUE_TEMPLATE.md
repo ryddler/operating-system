@@ -12,13 +12,13 @@
 
 **Hardware Environment**
 <!--
-Describe the Homme Assistant image you are using and the hardare environemnt
+Describe the Home Assistant image you are using and the hardware environment
 -->
 - [ ] Raspberry Pi [1/2/3/4]
 - [ ] ODROID [C2/C4/N2(+)/XU4]
 - [ ] ASUS Tinker [S]
-- [ ] Intel NUC (or compatible)
-- [ ] OVA (Open Virtualization Applicance, on Intel NUC or any other hardware, please add the Hypervisor you are using)
+- [ ] Generic x86-64 (like Intel NUC)
+- [ ] OVA (Open Virtualization Appliance, on Intel NUC or any other hardware, please add the Hypervisor you are using)
 
 **Home Assistant OS release:**
 - [ ] Fresh installation of release x.y
@@ -50,5 +50,5 @@ Describe the Homme Assistant image you are using and the hardare environemnt
 <!--
 - Is the problem reproducible?
 - Has this been working before (is this a regression?)
-- Has there been attempt to rule out harware issues? (different SD card etc.)
+- Has there been attempt to rule out hardware issues? (different SD card etc.)
 -->

@@ -12,6 +12,7 @@ jobs:
     runs-on: [ "ubuntu-20.04" ]
     outputs:
       version: ${{ steps.version_check.outputs.version }}
+      version_dev: ${{ steps.version_check.outputs.version_dev }}
     steps:
       - uses: actions/checkout@v2
       - name: Validate version
@@ -19,11 +20,20 @@ jobs:
         run: |
           major=$(cat ${GITHUB_WORKSPACE}/buildroot-external/meta | grep VERSION_MAJOR | cut -d'=' -f2)
           build=$(cat ${GITHUB_WORKSPACE}/buildroot-external/meta | grep VERSION_BUILD | cut -d'=' -f2)
-          if [ "${major}.${build}" != "${{ github.event.release.tag_name }}" ]; then
+          tag_major=$(echo "${{ github.event.release.tag_name }}" | cut -d '.' -f 1)
+          tag_build=$(echo "${{ github.event.release.tag_name }}" | cut -d '.' -f 2)
+          tag_dev=$(echo "${{ github.event.release.tag_name }}" | cut -d '.' -f 3)
+          if [ "${major}.${build}" != "${tag_major}.${tag_build}" ]; then
             echo "Version number in Buildroot metadata is does not match tag (${major}.${build} vs ${{ github.event.release.tag_name }})."
             exit 1
           fi
-          echo "::set-output name=version::${major}.${build}"
+          if [ "" != "${tag_dev}" ]; then
+            echo "Note: Release build with custom dev part: ${tag_dev}."
+            echo "::set-output name=version::${major}.${build}.${tag_dev}"
+          else
+            echo "::set-output name=version::${major}.${build}"
+          fi
+          echo "::set-output name=version_dev::${tag_dev}"
 
   build:
     name: Release build for ${{ matrix.board.name }}
@@ -32,7 +42,7 @@ jobs:
       matrix:
         board:
           - {"name": "ova", "output": "ova", "runner": "x86-64-runner"}
-          - {"name": "intel_nuc", "output": "intel-nuc", "runner": "x86-64-runner"}
+          - {"name": "generic_x86_64", "output": "generic-x86-64", "runner": "x86-64-runner"}
           - {"name": "odroid_c2", "output": "odroid-c2", "runner": "aarch64-runner"}
           - {"name": "odroid_c4", "output": "odroid-c4", "runner": "aarch64-runner"}
           - {"name": "odroid_n2", "output": "odroid-n2", "runner": "aarch64-runner"}
@@ -69,7 +79,7 @@ jobs:
           docker run --rm --privileged -v "${GITHUB_WORKSPACE}:/build" \
             -e BUILDER_UID="${BUILDER_UID}" -e BUILDER_GID="${BUILDER_GID}" \
             -v "${{ matrix.board.runner }}-build-cache:/cache" \
-            haos-builder make BUILDDIR=/build VERSION_DEV="" ${{ matrix.board.name }}
+            haos-builder make BUILDDIR=/build VERSION_DEV=${{ needs.validate_release.outputs.version_dev }} ${{ matrix.board.name }}
 
       - name: Upload disk image
         if: ${{ matrix.board.name != 'ova' }}
@@ -78,8 +88,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.img.xz
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.img.xz
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.img.xz
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.img.xz
           asset_content_type: application/x-xz
 
       - name: Upload rauc update
@@ -88,8 +98,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.raucb
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.raucb
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.raucb
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.raucb
           asset_content_type: application/octet-stream
 
       - name: Upload ova image
@@ -99,8 +109,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.ova
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.ova
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.ova
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.ova
           asset_content_type: application/x-tar
 
       - name: Upload qcow2 image
@@ -110,8 +120,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.qcow2.xz
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.qcow2.xz
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.qcow2.xz
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.qcow2.xz
           asset_content_type: application/x-xz
 
       - name: Upload vdi image
@@ -121,9 +131,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vdi.xz
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vdi.xz
-          asset_content_type: application/x-xz
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vdi.zip
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vdi.zip
+          asset_content_type: application/zip
 
       - name: Upload vhdx image
         if: ${{ matrix.board.name == 'ova' }}
@@ -132,9 +142,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vhdx.xz
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vhdx.xz
-          asset_content_type: application/x-xz
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vhdx.zip
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vhdx.zip
+          asset_content_type: application/zip
 
       - name: Upload vmdk image
         if: ${{ matrix.board.name == 'ova' }}
@@ -143,9 +153,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/release/hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vmdk.xz
-          asset_name: hassos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vmdk.xz
-          asset_content_type: application/x-xz
+          asset_path: ${{ github.workspace }}/release/haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vmdk.zip
+          asset_name: haos_${{ matrix.board.output }}-${{ needs.validate_release.outputs.version }}.vmdk.zip
+          asset_content_type: application/zip
 
   bump_version:
     name: Bump dev version to ${{ needs.validate_release.outputs.version }}
@@ -160,10 +170,10 @@ jobs:
         email: ${{ secrets.GIT_EMAIL }}
         token: ${{ secrets.GIT_TOKEN }}
 
-    - name: Bump Home Assistant OS dev version
+    - name: Bump Home Assistant OS beta version
       uses: home-assistant/actions/helpers/version-push@master
       with:
         key: "hassos[]"
         key-description: "Home Assistant OS"
         version: ${{ needs.validate_release.outputs.version }}
-        channel: "dev"
+        channel: "beta"

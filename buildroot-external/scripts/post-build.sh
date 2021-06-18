@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1090
+# shellcheck disable=SC1090,SC1091
 set -e
 
 SCRIPT_DIR=${BR2_EXTERNAL_HASSOS_PATH}/scripts
@@ -16,7 +16,6 @@ BOARD_DIR=${2}
 # HassOS tasks
 fix_rootfs
 install_tini_docker
-install_hassos_cli
 
 # Write os-release
 # shellcheck disable=SC2153
@@ -26,7 +25,7 @@ install_hassos_cli
     echo "ID=${HASSOS_ID}"
     echo "VERSION_ID=$(hassos_version)"
     echo "PRETTY_NAME=\"${HASSOS_NAME} $(hassos_version)\""
-    echo "CPE_NAME=cpe:2.3:o:home_assistant:${HASSOS_ID}:$(hassos_version):*:${DEPLOYMENT}:*:*:*:${BOARD_ID}:*"
+    echo "CPE_NAME=cpe:2.3:o:home-assistant:${HASSOS_ID}:$(hassos_version):*:${DEPLOYMENT}:*:*:*:${BOARD_ID}:*"
     echo "HOME_URL=https://hass.io/"
     echo "VARIANT=\"${HASSOS_NAME} ${BOARD_NAME}\""
     echo "VARIANT_ID=${BOARD_ID}"

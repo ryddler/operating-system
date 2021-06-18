@@ -60,6 +60,22 @@ $ datactl move /dev/sdx
 ```
 
 Enter "yes" to confirm the operation. This will prepare the disk, however, the
-actual move will be running on next reboot. Once complete, the external drive
+actual move will be running on next reboot. This will make the first boot significantly longer than usual; please be patient. Reboot with the following command:
+```sh
+$ ha host reboot
+```
+
+Once complete, the external drive
 will contain the data and will need to be plugged in to successfully boot Home
-Assistant OS.
+Assistant.
+
+## Check if the move was succesful.
+Within the Home Assistant interface you won't see if the move was succesful. To check this, go to your host console again (as described above) and enter:
+```sh
+$ systemctl status mnt-data.mount
+```
+If the data partition was moved to your USB drive you should see ```sh Active: active (mounted)  ``` in the output. Also, it will show, which drive got mounted as /mnt/data (```sh Where ``` and ```sh what ``` section of the output)
+
+
+## Check Power Supply Rating
+Using an USB attached SSD can draw quite some power. For instance on Raspberry Pi 3 the official Raspberry Pi power supply (PSU) only provides 2.5A which can be too tight. Use a power supply which can at least provide 3.5A. Alternatively use a powered USB hub. Connect the Hub to one of the USB slots of your Raspberry Pi, and connect the SSD to the Hub. The power supply that came with the Hub will power the attached device(s).

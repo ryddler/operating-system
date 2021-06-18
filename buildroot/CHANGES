@@ -1,3 +1,137 @@
+2021.02.2, released May 12th, 2021
+
+	Important / security related fixes.
+
+	Toolchain: Add logic to mark toolchains affected by binutils
+	bug 27597 (Nios II).
+
+	support/scripts/cve.py: Use the (significantly) faster yajl2
+	ijson backend for older (< 2.5) ijson versions rather than the
+	slow python default, speeding up pkg-stats by ~2x.
+
+	CMake infrastructure: Use CMAKE_EXE_LINKER_FLAGS rather than
+	CMAKE_CXX_FLAGS to link with libatomic to fix an compatibility
+	issue with poppler.
+
+	Infrastructure: Expose CONFIG_DIR to post-build/post-image
+	scripts, so they can call the Buildroot Makefile in the
+	correct directory for both in-tree / out-of-tree builds.
+
+	Updated/fixed packages: at91bootstrap, avahi, bash, bind,
+	bridge-utils, boost, cegui, cifs-utils, clamav, cmake,
+	coremark-pro, coreutils, cryptsetup, dmalloc, dnsmasq,
+	docker-cli, docker-engine, domoticz, efl, exim, ffmpeg, flex,
+	gcc, genext2fs, go, gst1-interpipe, haproxy, hostapd,
+	i2c-tools, imx-vpu, kexec, kf5-kcoreaddons, kismet, libcamera,
+	libcurl, libdrm, libfreefare, libfuse3, libgeos, libgpiod,
+	libnpupnp, libopenssl, libp11, librsync, libtomcrypt, libupnp,
+	localedef, lvm2, lxc, m4, makedevs, mender, mesa3d,
+	mesa3d-headers, mkpasswd, mkpimage, modem-manager, monkey,
+	mpd, ncurses, nettle, network-manager, nginx, numactl,
+	openjdk, openjdk-bin, openldap, openvpn, php, pipewire,
+	python-aioconsole, python-asgiref, python-botocore,
+	python-django, python-dnspython, python-flup, python-httplib2,
+	python-markdown2, python-mbrstrdecoder, python3, quickjs,
+	readline, rsyslog, ruby, rust, samba4, sconeserver, snort,
+	sox, systemd, tar, timescaledb, tio, tor, usb_modeswitch,
+	wpa_supplicant, xdriver_xf86-video-ati, xen, xlib_libXaw,
+	xserver_xorg-server
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#13271: systemd-resolved: /etc/resolv.conf link broken on per-pa..
+	#13551: 2021.02.rc2: Unicode not work on qt 5.15.2
+	#13651: pkg-golang cannot build when main.go is in the root
+	#13661: host-python2 build fails on aarch64
+	#13721: c-stack.c:55:26: error: missing binary operator before ..
+	#13731: Readline Patch is missing Author Information
+	#13741: genext2fs does not allow to set perms of root node
+	#13751: libopenssl (static): huge drop in performance in newer ..
+	#13771: package htop has undeclared dependency on host python
+
+2021.02.1, released April 7, 2021
+
+	Important / security related fixes.
+
+	Dependencies: Explicitly detect and bail out if PATH contains
+	spaces or tabs. A number of packages fail to build in such
+	setups, so explicitly inform about this.
+
+	utils/scanpypi: Explicitly use python3 for compatibility with
+	packages using python3 syntax in setup.py
+
+	support/download: Fix tarball generation (from git/svn repos)
+	including symlinks pointing to ./<something>. Fix svn download
+	for <1.9 clients or repos using CVS-style keywords.
+
+	Meson: Use correct C++ host compiler (rather than C compiler)
+
+	Toolchain: Add logic to work around binutils bug 21464,
+	affecting OpenRISC, and drop the now longer applicable bug
+	19615 / 20006 handling.
+
+	Python{,3}: Fix byte compiling python files with short (single
+	character before .py) file names.
+
+	CPE meta data has been added for a large number of packages
+
+	Defconfigs: Correct Beaglebone QT file system overlay
+
+	Updated/fixed packages: alsa-utils, at91bootstrap3,
+	batman-adv, binutils, botan, bridge-utils, busybox,
+	ca-certificates, cog, coreutils, diffutils, dmidecode,
+	docker-cli, docker-containerd, docker-engine, efivar,
+	fetchmail, frr, genimage, git, gnutls, go, grub2, gst-omx,
+	gst1-devtools, gst1-libav, gst1-plugins-bad,
+	gst1-plugins-base, gst1-plugins-good, gst1-plugins-ugly,
+	gst1-python, gst1-rtsp-server, gst1-vaapi, gstreamer1,
+	gstreamer1-editing-services, haproxy, haserl, hwloc,
+	irqbalance, jasper, kexec, kexec-lite, kismet, kodi, libcurl,
+	libfreeglut, libgcrypt, libgeos, libglib2, libopenssl, libqmi,
+	libressl, libupnp, libvips, libvpx, libwebsockets, linux,
+	lldpd, logrotate, lttng-libust, lttng-tools, mariadb, mbedtls,
+	mcelog, mender, micropython, mongoose, mosquitto, mpd,
+	netsnmp, nodejs, openmpi, openssh, openvpn, opkg-utils,
+	optee-client, optee-test, perl, php, proftpd, protobuf,
+	python-django, python-jinja2, python-lxml, python-paramiko,
+	python-py, python-pygments, python-rpi-ws281x, python-urllib3,
+	python3, qt5webkit, qwt, rpm, samba4, sconeserver, sdl2, shim,
+	sqlcipher, squid, sysklogd, syslinux, sysvinit, tor,
+	transmission, tzdata, uboot, uclibc, upx, webkitgtk,
+	wireshark, wpebackend-fdo, wpewebkit, xen, zstd
+
+	New packages: perl-parse-yapp
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#13516: utils/scanpypi: Failure when parsing diffoscope
+	#13576: Issues compiling buildroot for 5x86
+	#13601: Gen image :Iappropriate ioctl error
+	#13616: tar file from git repository generation issue
+	#13641: glibc on raspberrypi
+	#13646: Gen image version 14 error : no sub -section title/..
+	#13671: openSSH server closes connection before authentication..
+
+2021.02, released March 6th, 2021
+
+	Various fixes.
+
+	Toolchain: Correct Bootlin xtensa-lx60 dependencies
+
+	Updated/fixed packages: asterisk, belle-sip, bustle, dhcpcd,
+	dovecot, dovecot-pigeonhole, gnuchess, gnuradio,
+	gst1-plugins-bad, haproxy, jasper, kismet, libebml,
+	libeXosip2, libgeos, libhtp, libjpeg, libopenssl, libshout,
+	libstrophe, mosquitto, openblas, openssh, perl, privoxy,
+	prosody, python-pyyaml, python3-pyyaml, quagga, redis,
+	rust-bin, sox, suricata, tpm2-pkcs11, uclibc-ng-test, ushare,
+	util-linux, wolfssl, wpa_supplicant
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#13501: 2021.02.rc2: Unicode not work on qt 5.15.2
+	#13581: jpegsrc.v9d.tar.gz has changed hash
+
 2021.02-rc3, released February 27th, 2021
 
 	Fixes all over the tree.
